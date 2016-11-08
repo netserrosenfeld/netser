@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.4/angular.min.js"></script>
+<style>
+/*@import "compass/css3";*/
+
+@import url(http://fonts.googleapis.com/css?family=Merriweather);
+$red: #e74c3c;
+
+*, 
+*:before, 
+*:after {
+   @include box-sizing(border-box); 
+}
+
+html, body {
+  background: #f1f1f1;
+  font-family: 'Merriweather', sans-serif;
+  padding: 1em;
+}
+
+h1 {
+   text-align: center;
+   color: #a8a8a8;
+   @include text-shadow(1px 1px 0 rgba(white, 1));
+}
+
+form {
+   max-width: 600px;
+   text-align: center;
+   margin: 20px auto;
+  
+  input, textarea {
+     border:0; outline:0;
+     padding: 1em;
+     @include border-radius(8px);
+     display: block;
+     width: 100%;
+     margin-top: 1em;
+     font-family: 'Merriweather', sans-serif;
+     @include box-shadow(0 1px 1px rgba(black, 0.1));
+     resize: none;
+    
+    &:focus {
+       @include box-shadow(0 0px 2px rgba($red, 1)!important);
+    }
+  }
+  
+  #input-submit {
+     color: white; 
+     background: $red;
+     cursor: pointer;
+    
+    &:hover {
+       @include box-shadow(0 1px 1px 1px rgba(#aaa, 0.6)); 
+    }
+  }
+  
+  textarea {
+      height: 126px;
+  }
+}
+
+
+.half {
+  float: left;
+  width: 48%;
+  margin-bottom: 1em;
+}
+
+.right { width: 50%; }
+
+.left {
+     margin-right: 2%; 
+}
+
+
+@media (max-width: 480px) {
+  .half {
+     width: 100%; 
+     float: none;
+     margin-bottom: 0; 
+  }
+}
+
+
+/* Clearfix */
+.cf:before,
+.cf:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.cf:after {
+    clear: both;
+}</style>
+</head>
+<body ng-app="formExample">
+<div ng-controller="StudentController">
+<h1>Student management page</h1>
+<form class="cf">
+  <div class="half left cf">
+      <input type="text" id="input-subject" placeholder="student id">
+    <input type="text" id="i3nput-name" ng-model="user.name" placeholder="Full name">
+    <input type="email" id="input-email" ng-model="user.grade" placeholder="Grade ">
+  
+  </div>
+  <div class="half right cf">
+    Gender:
+ <input type="radio" ng-model="user.gender" value="male" />male
+    <input type="radio" ng-model="user.gender" value="female" />female </div> 
+  <p><input type="button" ng-click="reset()" value="Reset" />
+	
+    <input type="submit" ng-click="update(user)" value="Save" /></p >
+	<p><input type="button" ng-click="deleteStudent(user)" value="Delete" /><input type="text" placeholder="Student id here" ng-model="user.getId" /></p>
+	
+	<p><input type="button" ng-click="getSingleStudent(user)" value="Get single student" /><input type="text" placeholder="Student id here" ng-model="user.getId" /></p>
+	<p><input type="button" ng-click="getAllStudents()" value="Get all students" /></p>
+</form>
+  <pre>student details = {{user | json}}</pre>
+ 
+  <div>Response from server:{{message}}</div>
+  </br>List of students:
+  <div ng-repeat="student in studentList">
+  <span> {{student}}</span>
+ 
+  </div>
+</div>
+
+
+<script>
+  angular.module('formExample', [])
+    .controller('StudentController', ['$scope','$http', function($scope,$http) {
+      $scope.master = {};
+
+      $scope.update = function(user) {
+        $scope.master = angular.copy(user);
+       $http.get("http://localhost:8000/students/add?id="+user.id+"&grade="+user.grade+"&gender="+user.gender)
+    .then(function(response) {
+        $scope.message = response.data;
+    });
+      };
+  
+  $scope.getSingleStudent = function(user) {
+        $scope.master = angular.copy(user);
+       $http.get("http://localhost:8000/students/getData?id="+user.getId)
+    .then(function(response) {
+        $scope.message = response.data;
+    });
+      };
+	  
+	  $scope.deleteStudent = function(user) {
+        $scope.master = angular.copy(user);
+       $http.get("http://localhost:8000/students/remove?id="+user.getId)
+    .then(function(response) {
+        $scope.message = response.data;
+    });
+      };
+	  
+	  $scope.getAllStudents = function() {
+       
+       $http.get("http://localhost:8000/students/getAllStudents")
+    .then(function(response) {
+	
+        $scope.studentList = response.data;
+	
+	 });
+	};
+	
+      $scope.reset = function() {
+        $scope.user = angular.copy($scope.master);
+      };
+
+      $scope.reset();
+    }]);
+	
+	
+</script>
+</body>
+</html>
+
