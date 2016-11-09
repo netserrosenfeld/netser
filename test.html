@@ -102,10 +102,10 @@ form {
 <h1>Student management page</h1>
 <form class="cf">
   <div class="half left cf">
-      <input type="text" id="input-subject" placeholder="student id">
-    <input type="text" id="i3nput-name" ng-model="user.name" placeholder="Full name">
-    <input type="email" id="input-email" ng-model="user.grade" placeholder="Grade ">
-  
+      <input type="text" id="input-id" ng-model="user.id" placeholder="student id">
+    <input type="text" id="input-name" ng-model="user.name" placeholder="Full name">
+    <input type="text" id="input-Grade" ng-model="user.grade" placeholder="Grade ">
+   <input type="text" id="input-Grade" ng-model="user.port" placeholder="port# of the server ">
   </div>
   <div class="half right cf">
     Gender:
@@ -117,16 +117,17 @@ form {
 	<p><input type="button" ng-click="deleteStudent(user)" value="Delete" /><input type="text" placeholder="Student id here" ng-model="user.getId" /></p>
 	
 	<p><input type="button" ng-click="getSingleStudent(user)" value="Get single student" /><input type="text" placeholder="Student id here" ng-model="user.getId" /></p>
-	<p><input type="button" ng-click="getAllStudents()" value="Get all students" /></p>
+	<p><input type="button" ng-click="getAllStudents(user)" value="Get all students" /></p>
 </form>
   <pre>student details = {{user | json}}</pre>
  
   <div>Response from server:{{message}}</div>
+  </br>
   </br>List of students:
-  <div ng-repeat="student in studentList">
-  <span> {{student}}</span>
+  
+  <span> {{studentList}}</span>
  
-  </div>
+ 
 </div>
 
 
@@ -137,7 +138,7 @@ form {
 
       $scope.update = function(user) {
         $scope.master = angular.copy(user);
-       $http.get("http://localhost:8000/students/add?id="+user.id+"&grade="+user.grade+"&gender="+user.gender)
+       $http.get("http://localhost:"+user.port+"/students/add?id="+user.id+"&grade="+user.grade+"&gender="+user.gender)
     .then(function(response) {
         $scope.message = response.data;
     });
@@ -145,7 +146,7 @@ form {
   
   $scope.getSingleStudent = function(user) {
         $scope.master = angular.copy(user);
-       $http.get("http://localhost:8000/students/getData?id="+user.getId)
+       $http.get("http://localhost:"+user.port+"/students/getData?id="+user.getId)
     .then(function(response) {
         $scope.message = response.data;
     });
@@ -153,15 +154,15 @@ form {
 	  
 	  $scope.deleteStudent = function(user) {
         $scope.master = angular.copy(user);
-       $http.get("http://localhost:8000/students/remove?id="+user.getId)
+       $http.get("http://localhost:"+user.port+"/students/remove?id="+user.getId)
     .then(function(response) {
         $scope.message = response.data;
     });
       };
 	  
-	  $scope.getAllStudents = function() {
+	  $scope.getAllStudents = function(user) {
        
-       $http.get("http://localhost:8000/students/getAllStudents")
+       $http.get("http://localhost:"+user.port+"/students/getAllStudents")
     .then(function(response) {
 	
         $scope.studentList = response.data;
